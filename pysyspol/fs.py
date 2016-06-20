@@ -30,3 +30,12 @@ def rsync_multiple(src, dst, opts, *paths, rsync_path='rsync'):
             report.append((tuple(cmd), proc.returncode))
 
     return tuple(report)
+
+def unison(profile, *paths, interface='text', opts=(), unison_path='unison'):
+    cmd = [unison_path, profile, '-ui', interface]
+    cmd.extend(opts)
+    cmd.extend(chain(*map(lambda x: ('-path', x), paths)))
+    logging.info(' '.join(cmd))
+    with Popen(cmd, stdout=sys.stdout, stderr=sys.stderr) as proc:
+        proc.wait()
+        return proc.returncode
