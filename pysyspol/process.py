@@ -18,7 +18,7 @@ def is_remote_unix_process_active(reobj, remote_id, ps_cmd=('ps', 'aux'),
                 if reobj.match(l)]
     return len(matched_processes) > 0
 
-def is_local_anki_desktop_active(pattern=r'.*python.*anki',
+def is_local_anki_desktop_active(pattern=r'.*python.*bin/anki',
         ps_cmd=('ps', 'aux')):
     reobj = re.compile(pattern, re.IGNORECASE)
     return is_local_unix_process_active(reobj, ps_cmd)
