@@ -18,6 +18,13 @@ def is_remote_unix_process_active(reobj, remote_id, ps_cmd=('ps', 'aux'),
                 if reobj.match(l)]
     return len(matched_processes) > 0
 
-def is_local_anki_desktop_active(pattern=r'.*python.*anki', ps_cmd=('ps', 'aux')):
+def is_local_anki_desktop_active(pattern=r'.*python.*anki',
+        ps_cmd=('ps', 'aux')):
     reobj = re.compile(pattern, re.IGNORECASE)
     return is_local_unix_process_active(reobj, ps_cmd)
+
+def is_remote_ankidroid_active(hostname, user=None,
+        pattern=r'.*com.ichi2.anki.*', ps_cmd=('ps',)):
+    reobj = re.compile(pattern, re.IGNORECASE)
+    remote_id = '@'.join(user, hostname) if user else hostname
+    return is_remote_unix_process_active(reobj, remote_id, ps_cmd)
