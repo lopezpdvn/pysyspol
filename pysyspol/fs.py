@@ -1,6 +1,7 @@
 import sys
 import os
 import logging
+import re
 from itertools import chain
 from subprocess import Popen
 
@@ -36,3 +37,8 @@ def unison(profile, *paths, interface='text', opts=(), unison_path='unison'):
     with Popen(cmd, stdout=sys.stdout, stderr=sys.stderr) as proc:
         proc.wait()
         return proc.returncode
+
+def is_filesystem_mounted(src, dst):
+    reobj = re.compile(r'{}.*{}'.format(src, dst))
+    with open('/proc/mounts') as mounts:
+        return any(reobj.match(mount.strip()) for mount in mounts)
