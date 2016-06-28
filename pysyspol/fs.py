@@ -38,7 +38,11 @@ def unison(profile, *paths, interface='text', opts=(), unison_path='unison'):
         proc.wait()
         return proc.returncode
 
-def is_filesystem_mounted(src, dst):
-    reobj = re.compile(r'{}.*{}'.format(src, dst))
+def is_filesystem_mounted(*, reobj=None, device='', mountdir=''):
+    if reobj is None:
+        if not (device or mountdir):
+            raise ValueError('No pattern was provided')
+        pattern = r'{}.*{}' if device and mountdir else r'{}'
+        reobj = re.compile(pattern.format(device, mountdir))
     with open('/proc/mounts') as mounts:
         return any(reobj.match(mount.strip()) for mount in mounts)
