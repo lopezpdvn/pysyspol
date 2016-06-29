@@ -42,7 +42,11 @@ def is_filesystem_mounted(*, reobj=None, device='', mountdir=''):
     if reobj is None:
         if not (device or mountdir):
             raise ValueError('No pattern was provided')
-        pattern = r'{}.*{}' if device and mountdir else r'{}'
-        reobj = re.compile(pattern.format(device, mountdir))
+        elif device and not mountdir:
+            reobj = re.compile(r'.*{}.*'.format(device))
+        elif mountdir and not device:
+            reobj = re.compile(r'.*{}.*'.format(mountdir))
+        else:
+            reobj = re.compile(r'.*{}.*{}.*'.format(device, mountdir))
     with open('/proc/mounts') as mounts:
         return any(reobj.match(mount.strip()) for mount in mounts)
