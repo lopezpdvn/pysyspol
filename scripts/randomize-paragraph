@@ -1,0 +1,25 @@
+#!/usr/bin/env python3
+# coding=utf-8
+
+'''randomize-paragraph
+'''
+
+# Standard library imports.
+import os
+import sys
+import random
+
+# GLOBAL CONSTANT names.
+PN = os.path.splitext(os.path.basename(sys.argv[0]))[0]
+INFP = os.path.join('.', '{}-input.txt'.format(PN))
+OUTFP = os.path.join('.', '{}-output.txt'.format(PN))
+
+with open(INFP) as f:
+    inf = [l for l in [l.strip() for l in f.readlines()] if l]
+
+random.shuffle(inf)
+
+with open(OUTFP, 'w') as f:
+    f.write('{}\n'.format(' '.join(inf)))
+
+# vim: ft=python
