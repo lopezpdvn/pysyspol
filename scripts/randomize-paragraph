@@ -8,6 +8,7 @@
 import os
 import sys
 import random
+from itertools import chain
 
 # GLOBAL CONSTANT names.
 PN = os.path.splitext(os.path.basename(sys.argv[0]))[0]
@@ -15,7 +16,8 @@ INFP = os.path.join('.', '{}-input.txt'.format(PN))
 OUTFP = os.path.join('.', '{}-output.txt'.format(PN))
 
 with open(INFP) as f:
-    inf = [l for l in [l.strip() for l in f.readlines()] if l]
+    inf = list(chain.from_iterable(
+        l.split() for l in [l.strip() for l in f.readlines()] if l))
 
 random.shuffle(inf)
 
