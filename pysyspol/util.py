@@ -1,7 +1,8 @@
+import sys
 import os
 from random import SystemRandom
 from string import ascii_letters, digits
-from os.path import abspath, dirname
+from os.path import abspath, dirname, basename, splitext
 from inspect import getfile
 
 ALPHA_NUMERIC_STR = ascii_letters + digits
@@ -20,3 +21,6 @@ def getdir(obj):
       script_dir = getdir(inspect.currentframe())
     '''
     return dirname(abspath(getfile(obj))).rstrip(os.sep)
+
+def get_script_name():
+    return splitext(basename(sys.argv[0]))[0]
