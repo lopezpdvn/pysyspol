@@ -2,6 +2,7 @@ import json
 import logging
 from os import access, R_OK
 from os.path import join
+from itertools import chain
 
 from pysyspol.util import get_script_name
 
@@ -32,3 +33,8 @@ def validate_paths(resources, resources_fp):
         logging.error('Some errors happened trying to read resources')
 
     return valid
+
+def get_valid_tags(tags_fp):
+    with open(tags_fp) as tagsf:
+        tag_entries = json.load(tagsf)
+    return chain.from_iterable(tag['id'] for tag in tag_entries)
