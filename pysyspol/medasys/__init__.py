@@ -1,7 +1,7 @@
 import json
 import logging
-from os import access, R_OK
-from os.path import join
+from os import access, R_OK, walk
+from os.path import join, sep
 from itertools import chain
 
 from pysyspol.util import get_script_name
@@ -56,3 +56,11 @@ def validate_tags(resources, tags_fp):
 
 def get_tags(resources):
     return sorted(set(chain.from_iterable(i['tags'] for i in resources)))
+
+def get_all_resources(resources_fp, approot_fp):
+    for relpath, dirs, files in walk(resources_fp):
+        if relpath == approot_fp:
+            dirs[:] = []
+            continue
+        for f in files:
+            yield join(relpath, f).replace(resources_fp, '').strip(sep)
