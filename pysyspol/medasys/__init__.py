@@ -38,3 +38,18 @@ def get_valid_tags(tags_fp):
     with open(tags_fp) as tagsf:
         tag_entries = json.load(tagsf)
     return chain.from_iterable(tag['id'] for tag in tag_entries)
+
+def validate_tags(resources, tags_fp):
+    valid_tags = tuple(get_valid_tags(tags_fp))
+    valid = True
+    for resource in resources:
+        for tag in resource['tags']:
+            if tag not in valid_tags:
+                logging.error('Tag `{}` of resource `{}` not valid'.format(
+                    tag, resource['path']))
+                valid = False
+    if valid:
+        logging.info('All tags are valid')
+    else:
+        logging.error('Some errors happened trying to validate tags')
+    return valid
