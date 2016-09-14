@@ -53,3 +53,6 @@ def validate_tags(resources, tags_fp):
     else:
         logging.error('Some errors happened trying to validate tags')
     return valid
+
+def get_tags(resources):
+    return sorted(set(chain.from_iterable(i['tags'] for i in resources)))
