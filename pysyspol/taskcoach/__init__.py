@@ -20,19 +20,16 @@ def get_category_efforts(categories=(), *, paths=None):
                     return _tsk_file_get_category_efforts(categories, tsk)
 
 def _tsk_file_get_category_efforts(categories, tskfp):
-    effort_time = timedelta()
     doc = parse(tskfp)
     categories = tuple(categories)
     for tskcategory in doc.iterfind('category'):
+        effort_time = timedelta()
         subject = tskcategory.get('subject')
         if subject not in categories:
             continue
         tasks = tuple(tskcategory.get('categorizables').split())
         for task in tasks:
-            #print(task)
-            #print(get_task_effort(task, tskfp))
             effort_time += get_task_effort(task, tskfp)
-            pass
         yield (subject, effort_time)
 
 def get_task_effort(tskid, tskfp, start=None, end=None):
@@ -41,15 +38,9 @@ def get_task_effort(tskid, tskfp, start=None, end=None):
         start = datetime.now() - DEFAULT_TIMEDELTA
 
     doc = parse(tskfp)
-    task = None
-    for tsktask in doc.iterfind('task'):
-        if tsktask.get('id') == tskid:
-            task = tsktask
-            break
+    task = doc.find(".//task[@id='{}']".format(tskid))
     if task is None:
         return effort_time
-
-    #print('Task `{}`'.format(task.get('subject')))
 
     for effort in task.iterfind('effort'):
         try:
@@ -58,11 +49,12 @@ def get_task_effort(tskid, tskfp, start=None, end=None):
             effort_end = datetime.strptime(effort.get('stop'),
                     DEFAULT_DATETIME_FMT)
         except TypeError:
-            print('Effort id `{}` has no stop attribute'.format(effort.get('id')))
+            print('Effort id `{}` has no stop attribute'.format(
+                effort.get('id')), file=sys.stderr)
             continue
-        if effort_start.date() < start.date():
+        if effort_start < start:
             continue
-        if end is not None and effort_end.date() > end.date():
+        if end is not None and effort_end > end:
             continue
         effort_time += effort_end - effort_start
 
