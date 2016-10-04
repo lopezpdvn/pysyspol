@@ -1,0 +1,17 @@
+from os import environ
+from os.path import pathsep
+from pysyspol.taskcoach import get_category_efforts
+
+TASKCOACH_FP = environ['PYSYSPOL_TASKCOACH_FP'].split(pathsep)
+CATEGORIES = environ['PYSYSPOL_TASKCOACH_DEFAULT_CATEGORIES'].split()
+PRINT_FMT = '{0}\t{1}\n'
+
+try:
+    for category, effort in \
+        get_category_efforts(CATEGORIES, paths=TASKCOACH_FP):
+
+        print(PRINT_FMT.format(category, effort), end='')
+except KeyError:
+    raise
+
+# vim: ft=python
