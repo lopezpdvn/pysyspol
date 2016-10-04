@@ -1,3 +1,4 @@
+import sys
 from os.path import isdir, join
 from glob import iglob
 from xml.etree.ElementTree import parse
@@ -12,14 +13,17 @@ DEFAULT_DATETIME_FMT = '%Y-%m-%d %H:%M:%S'
 def get_categories():
     return ()
 
-def get_category_efforts(categories=(), *, paths=None):
+def get_category_efforts(categories=(), start=None, *, paths=None):
+    if start is None:
+        start = datetime.now() - DEFAULT_TIMEDELTA
+
     if paths is not None:
         for path in paths:
             if isdir(path):
                 for tsk in iglob(join(path, '*'+file_ext)):
-                    return _tsk_file_get_category_efforts(categories, tsk)
+                    return _tsk_file_get_category_efforts(categories, tsk, start)
 
-def _tsk_file_get_category_efforts(categories, tskfp):
+def _tsk_file_get_category_efforts(categories, tskfp, start):
     doc = parse(tskfp)
     categories = tuple(categories)
     for tskcategory in doc.iterfind('category'):
@@ -29,14 +33,11 @@ def _tsk_file_get_category_efforts(categories, tskfp):
             continue
         tasks = tuple(tskcategory.get('categorizables').split())
         for task in tasks:
-            effort_time += get_task_effort(task, tskfp)
-        yield (subject, effort_time)
+            effort_time += get_task_effort(task, tskfp, start)
+        yield (subject, effort_time.total_seconds())
 
-def get_task_effort(tskid, tskfp, start=None, end=None):
+def get_task_effort(tskid, tskfp, start, end=None):
     effort_time = timedelta()
-    if start is None:
-        start = datetime.now() - DEFAULT_TIMEDELTA
-
     doc = parse(tskfp)
     task = doc.find(".//task[@id='{}']".format(tskid))
     if task is None:
@@ -49,8 +50,8 @@ def get_task_effort(tskid, tskfp, start=None, end=None):
             effort_end = datetime.strptime(effort.get('stop'),
                     DEFAULT_DATETIME_FMT)
         except TypeError:
-            print('Effort id `{}` has no stop attribute'.format(
-                effort.get('id')), file=sys.stderr)
+            #print('Effort id `{}` has no stop attribute'.format(
+                #effort.get('id')), file=sys.stderr)
             continue
         if effort_start < start:
             continue

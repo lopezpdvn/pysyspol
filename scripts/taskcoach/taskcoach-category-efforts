@@ -1,14 +1,24 @@
+#!/usr/bin/env python3
+# coding=utf-8
+
+'''taskcoach-category-efforts
+'''
+
 from os import environ
 from os.path import pathsep
-from pysyspol.taskcoach import get_category_efforts
+from datetime import datetime
 
-TASKCOACH_FP = environ['PYSYSPOL_TASKCOACH_FP'].split(pathsep)
-CATEGORIES = environ['PYSYSPOL_TASKCOACH_DEFAULT_CATEGORIES'].split()
+from pysyspol.taskcoach import get_category_efforts, DEFAULT_DATETIME_FMT
+
+TASKCOACH_FP = environ['SYSPOL_TASKCOACH_FP'].split(pathsep)
+CATEGORIES = environ['SYSPOL_TASKCOACH_DEFAULT_CATEGORIES'].split()
+START = datetime.strptime(environ['SYSPOL_TASKCOACH_DEFAULT_START'],
+        DEFAULT_DATETIME_FMT)
 PRINT_FMT = '{0}\t{1}\n'
 
 try:
     for category, effort in \
-        get_category_efforts(CATEGORIES, paths=TASKCOACH_FP):
+        get_category_efforts(CATEGORIES, START, paths=TASKCOACH_FP):
 
         print(PRINT_FMT.format(category, effort), end='')
 except KeyError:
