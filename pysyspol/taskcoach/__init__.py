@@ -21,12 +21,13 @@ def get_category_efforts(categories=(), start=None, *, paths=None):
         for path in paths:
             if isdir(path):
                 for tsk in iglob(join(path, '*'+file_ext)):
-                    return _tsk_file_get_category_efforts(categories, tsk, start)
+                    return _tsk_file_get_category_efforts(categories, tsk,
+                            start)
 
 def _tsk_file_get_category_efforts(categories, tskfp, start):
     doc = parse(tskfp)
     categories = tuple(categories)
-    for tskcategory in doc.iterfind('category'):
+    for tskcategory in doc.iterfind('.//category'):
         effort_time = timedelta()
         subject = tskcategory.get('subject')
         if subject not in categories:
