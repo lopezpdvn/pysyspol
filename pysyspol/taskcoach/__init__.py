@@ -13,7 +13,7 @@ DEFAULT_DATETIME_FMT = '%Y-%m-%d %H:%M:%S'
 def get_categories():
     return ()
 
-def get_category_efforts(categories=(), start=None, *, paths=None):
+def get_category_efforts(categories=(), start=None, end=None, *, paths=None):
     if start is None:
         start = datetime.now() - DEFAULT_TIMEDELTA
 
@@ -21,10 +21,10 @@ def get_category_efforts(categories=(), start=None, *, paths=None):
         for path in paths:
             if isdir(path):
                 for tsk in iglob(join(path, '*'+file_ext)):
-                    return _tsk_file_get_category_efforts(categories, tsk,
-                            start)
+                    yield from _tsk_file_get_category_efforts(categories, tsk,
+                            start, end)
 
-def _tsk_file_get_category_efforts(categories, tskfp, start):
+def _tsk_file_get_category_efforts(categories, tskfp, start, end):
     doc = parse(tskfp)
     categories = tuple(categories)
     for tskcategory in doc.iterfind('.//category'):
@@ -34,7 +34,7 @@ def _tsk_file_get_category_efforts(categories, tskfp, start):
             continue
         tasks = tuple(tskcategory.get('categorizables').split())
         for task in tasks:
-            effort_time += get_task_effort(task, tskfp, start)
+            effort_time += get_task_effort(task, tskfp, start, end)
         yield (subject, effort_time.total_seconds())
 
 def get_task_effort(tskid, tskfp, start, end=None):
