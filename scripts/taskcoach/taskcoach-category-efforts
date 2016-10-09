@@ -4,6 +4,7 @@
 '''taskcoach-category-efforts
 '''
 
+import sys
 from os import environ
 from os.path import pathsep
 from datetime import datetime, timedelta
@@ -11,11 +12,14 @@ from datetime import datetime, timedelta
 from pysyspol.taskcoach import get_category_efforts, DEFAULT_DATETIME_FMT
 
 TASKCOACH_FP = environ['SYSPOL_TASKCOACH_FP'].split(pathsep)
-CATEGORIES = environ['SYSPOL_TASKCOACH_DEFAULT_CATEGORIES'].split()
-START = datetime.strptime(environ['SYSPOL_TASKCOACH_DEFAULT_START'],
+CATEGORIES = environ[\
+    'SYSPOL_TASKCOACH_CATEGORY_EFFORT_VIEWER_DEFAULT_CATEGORIES'].split()
+START = datetime.strptime(
+        environ['SYSPOL_TASKCOACH_CATEGORY_EFFORT_VIEWER_DEFAULT_START'],
         DEFAULT_DATETIME_FMT)
 try:
-    END = datetime.strptime(environ['SYSPOL_TASKCOACH_DEFAULT_END'],
+    END = datetime.strptime(
+            environ['SYSPOL_TASKCOACH_CATEGORY_EFFORT_VIEWER_DEFAULT_END'],
             DEFAULT_DATETIME_FMT)
 except ValueError:
     END = None
@@ -27,5 +31,10 @@ out = [(category, effort, effort / total_effort) for category, effort in out]
 
 for record in out:
     print('\t'.join(str(i) for i in record))
+
+print(file=sys.stderr)
+print('Start: {}, End: {}'.format(START, END), file=sys.stderr)
+print('Total effort time: {}'.format(timedelta(seconds=total_effort)),
+        file=sys.stderr)
 
 # vim: ft=python
