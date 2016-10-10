@@ -4,6 +4,8 @@ from glob import iglob
 from xml.etree.ElementTree import parse
 from datetime import datetime, timedelta
 
+import matplotlib.pyplot as plt
+
 # syspol reference
 file_ext = '.tsk'
 
@@ -23,6 +25,16 @@ def get_category_efforts(categories=(), start=None, end=None, *, paths=None):
                 for tsk in iglob(join(path, '*'+file_ext)):
                     yield from _tsk_file_get_category_efforts(categories, tsk,
                             start, end)
+
+def plot_category_efforts(data, fnames=()):
+    if not len(fnames):
+        return
+    categories = tuple(record[0] for record in data)
+    effort = tuple(record[1] for record in data)
+    plt.pie(effort, labels=categories, shadow=True)
+    plt.axis('equal')
+    for fname in fnames:
+        plt.savefig(fname)
 
 def _tsk_file_get_category_efforts(categories, tskfp, start, end):
     doc = parse(tskfp)

@@ -9,7 +9,8 @@ from os import environ
 from os.path import pathsep
 from datetime import datetime, timedelta
 
-from pysyspol.taskcoach import get_category_efforts, DEFAULT_DATETIME_FMT
+from pysyspol.taskcoach import (get_category_efforts, DEFAULT_DATETIME_FMT,
+    plot_category_efforts)
 
 TASKCOACH_FP = environ['SYSPOL_TASKCOACH_FP'].split(pathsep)
 CATEGORIES = environ[\
@@ -19,10 +20,17 @@ START = datetime.strptime(
         DEFAULT_DATETIME_FMT)
 try:
     END = datetime.strptime(
-            environ['SYSPOL_TASKCOACH_CATEGORY_EFFORT_VIEWER_DEFAULT_END'],
-            DEFAULT_DATETIME_FMT)
+        environ['SYSPOL_TASKCOACH_CATEGORY_EFFORT_VIEWER_DEFAULT_END'],
+        DEFAULT_DATETIME_FMT)
 except ValueError:
     END = None
+
+try:
+    IMG_PLOT_FP = \
+        environ['SYSPOL_TASKCOACH_CATEGORY_EFFORT_VIEWER_DEFAULT_IMG_PLOT_FP']\
+        .split(pathsep)
+except ValueError:
+    IMG_PLOT_FP = ()
 
 out = [(category, effort) for category, effort in
         get_category_efforts(CATEGORIES, START, END, paths=TASKCOACH_FP)]
@@ -36,5 +44,7 @@ print(file=sys.stderr)
 print('Start: {}, End: {}'.format(START, END), file=sys.stderr)
 print('Total effort time: {}'.format(timedelta(seconds=total_effort)),
         file=sys.stderr)
+
+plot_category_efforts(out, IMG_PLOT_FP)
 
 # vim: ft=python
