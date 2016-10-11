@@ -38,16 +38,17 @@ def plot_category_efforts(data, fnames=()):
 
 def _tsk_file_get_category_efforts(categories, tskfp, start, end):
     doc = parse(tskfp)
-    categories = tuple(categories)
-    for tskcategory in doc.iterfind('.//category'):
+
+    for subject in categories:
         effort_time = timedelta()
-        subject = tskcategory.get('subject')
-        if subject not in categories:
+        category = doc.find(".//category[@subject='{}']".format(subject))
+        try:
+            tasks = category.get('categorizables')
+            for taskid in tasks.split():
+                effort_time += get_task_effort(taskid, tskfp, start, end)
+            yield (subject, effort_time.total_seconds())
+        except AttributeError:
             continue
-        tasks = tuple(tskcategory.get('categorizables').split())
-        for task in tasks:
-            effort_time += get_task_effort(task, tskfp, start, end)
-        yield (subject, effort_time.total_seconds())
 
 def get_task_effort(tskid, tskfp, start, end=None):
     effort_time = timedelta()
