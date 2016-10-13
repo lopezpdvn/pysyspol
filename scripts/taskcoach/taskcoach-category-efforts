@@ -8,13 +8,20 @@ import sys
 from os import environ
 from os.path import pathsep
 from datetime import datetime, timedelta
+from argparse import ArgumentParser
 
 from pysyspol.taskcoach import (get_category_efforts, DEFAULT_DATETIME_FMT,
     plot_category_efforts)
 
+parser = ArgumentParser()
+parser.add_argument('category_subjects', nargs='*')
+args = parser.parse_args()
+
 TASKCOACH_FP = environ['SYSPOL_TASKCOACH_FP'].split(pathsep)
-CATEGORIES = environ[\
-    'SYSPOL_TASKCOACH_CATEGORY_EFFORT_VIEWER_DEFAULT_CATEGORIES'].split()
+CATEGORIES = (args.category_subjects if args.category_subjects
+    else environ['SYSPOL_TASKCOACH_CATEGORY_EFFORT_VIEWER_DEFAULT_CATEGORIES']\
+            .split())
+
 START = datetime.strptime(
         environ['SYSPOL_TASKCOACH_CATEGORY_EFFORT_VIEWER_DEFAULT_START'],
         DEFAULT_DATETIME_FMT)
