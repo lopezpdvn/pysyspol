@@ -14,7 +14,7 @@ from pysyspol.taskcoach import (get_category_efforts, DEFAULT_DATETIME_FMT,
     plot_category_efforts)
 
 stderro_fmt = '{}: {}'
-stderro_names = ['start', 'end', 'total_effort_time']
+stderro_names = ('start', 'end', 'total_effort_time', 'total_time', 'effort_fraction')
 stderro_vals = []
 
 parser = ArgumentParser()
@@ -39,7 +39,7 @@ try:
     END = datetime.strptime(args.end if args.end
         else environ['SYSPOL_TASKCOACH_CATEGORY_EFFORT_VIEWER_DEFAULT_END'],
         DEFAULT_DATETIME_FMT)
-except ValueError:
+except (KeyError, ValueError):
     END = None
 stderro_vals.append(END)
 
@@ -55,9 +55,22 @@ except ValueError:
 out = tuple((category, effort) for category, effort in
         get_category_efforts(CATEGORIES, START, END, paths=TASKCOACH_FP))
 total_effort = sum(record[1] for record in out)
-stderro_vals.append(total_effort)
-out = [(category, effort, effort / total_effort) for category, effort in out]
+stderro_vals.append(timedelta(seconds=total_effort))
+if total_effort:
+    out = [(category, effort, effort / total_effort)
+            for category, effort in out]
+else:
+    out = [(category, effort, None)
+            for category, effort in out]
+
 out.sort(key=lambda record: record[1], reverse=args.reverse)
+try:
+    end = (END - START).total_seconds()
+except TypeError:
+    end = datetime.now()
+total_time = (end - START).total_seconds()
+stderro_vals.append(timedelta(seconds=total_time))
+stderro_vals.append(total_effort / total_time)
 
 for record in out:
     print('\t'.join(str(i) for i in record))
