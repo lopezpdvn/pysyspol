@@ -19,12 +19,17 @@ def get_category_efforts(categories=(), start=None, end=None, *, paths=None):
     if start is None:
         start = datetime.now() - DEFAULT_TIMEDELTA
 
+    efforts = {}
     if paths is not None:
         for path in paths:
             if isdir(path):
                 for tsk in iglob(join(path, '*'+file_ext)):
-                    yield from _tsk_file_get_category_efforts(categories, tsk,
-                            start, end)
+                    for ctg, eff in _tsk_file_get_category_efforts(categories,
+                            tsk, start, end):
+                        efforts[ctg] = efforts.get(ctg, timedelta()) + eff
+
+    for ctg, eff in efforts.items():
+        yield (ctg, eff.total_seconds())
 
 def plot_category_efforts(data, fnames=()):
     if not len(fnames):
@@ -46,7 +51,7 @@ def _tsk_file_get_category_efforts(categories, tskfp, start, end):
             tasks = category.get('categorizables')
             for taskid in tasks.split():
                 effort_time += get_task_effort(taskid, tskfp, start, end)
-            yield (subject, effort_time.total_seconds())
+            yield (subject, effort_time)
         except AttributeError:
             continue
 
