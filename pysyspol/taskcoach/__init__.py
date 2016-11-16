@@ -11,6 +11,8 @@ file_ext = '.tsk'
 
 DEFAULT_TIMEDELTA = timedelta(weeks=1)
 DEFAULT_DATETIME_FMT = '%Y-%m-%d %H:%M:%S'
+XPATHSEP = '/'
+XPATH_MATCH_PREFIX = '.{0}{0}'.format(XPATHSEP)
 
 def get_categories():
     return ()
@@ -44,14 +46,21 @@ def plot_category_efforts(data, fnames=()):
 def _tsk_file_get_category_efforts(categories, tskfp, start, end):
     doc = parse(tskfp)
 
-    for subject in categories:
+    for subj in categories:
         effort_time = timedelta()
-        category = doc.find(".//category[@subject='{}']".format(subject))
+        subj = subj.strip(XPATHSEP)
+        subjs = subj.split(XPATHSEP)
+        subj = subjs[0]
+        match = XPATH_MATCH_PREFIX + XPATHSEP.join(
+                "category[@subject='{}']".format(i) for i in subjs)
+        #category = doc.find(".//category[@subj='{}']".format(subj))
+        print(match)
+        category = doc.find(match)
         try:
             tasks = category.get('categorizables')
             for taskid in tasks.split():
                 effort_time += get_task_effort(taskid, tskfp, start, end)
-            yield (subject, effort_time)
+            yield (subj, effort_time)
         except AttributeError:
             continue
 
