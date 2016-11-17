@@ -46,21 +46,17 @@ def plot_category_efforts(data, fnames=()):
 def _tsk_file_get_category_efforts(categories, tskfp, start, end):
     doc = parse(tskfp)
 
-    for subj in categories:
+    for subjsel in categories:
         effort_time = timedelta()
-        subj = subj.strip(XPATHSEP)
-        subjs = subj.split(XPATHSEP)
-        subj = subjs[0]
-        match = XPATH_MATCH_PREFIX + XPATHSEP.join(
-                "category[@subject='{}']".format(i) for i in subjs)
-        #category = doc.find(".//category[@subj='{}']".format(subj))
-        print(match)
+        match = (XPATH_MATCH_PREFIX +
+                XPATHSEP.join("category[@subject='{}']".format(i)
+                    for i in subjsel.split(XPATHSEP)))
         category = doc.find(match)
         try:
             tasks = category.get('categorizables')
             for taskid in tasks.split():
                 effort_time += get_task_effort(taskid, tskfp, start, end)
-            yield (subj, effort_time)
+            yield (subjsel, effort_time)
         except AttributeError:
             continue
 
