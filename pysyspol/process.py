@@ -1,6 +1,8 @@
 import re
 from subprocess import Popen, PIPE
 from itertools import chain
+from os.path import join, exists
+from os import getpid, remove
 
 def is_local_unix_process_active(reobj, ps_cmd=('ps', 'aux')):
     with Popen(ps_cmd, stdout=PIPE, stderr=PIPE,
@@ -28,3 +30,20 @@ def is_remote_ankidroid_active(hostname, user=None,
     reobj = re.compile(pattern, re.IGNORECASE)
     remote_id = '@'.join(user, hostname) if user else hostname
     return is_remote_unix_process_active(reobj, remote_id, ps_cmd)
+
+def is_app_locked(root, name):
+    lockf = join(root, 'var', 'lock', 'LCK..' + name)
+    return lockf if exists(lockf) else False
+
+def lock_app(root, name, lock=True):
+    """Returns lock filepath if something was done, False otherwise"""
+    lockf = join(root, 'var', 'lock', 'LCK..' + name)
+    is_locked = is_app_locked(root, name)
+    if lock and not is_locked:
+        with open(lockf, 'w') as f:
+            print(getpid(), file=f)
+        return lockf
+    if not lock and is_locked:
+        remove(lockf)
+        return lockf
+    return False
