@@ -1,3 +1,12 @@
+#!/usr/bin/env python
+# coding=utf-8
+# Author: Pedro Ivan Lopez
+# Contact: http://pedroivanlopez.com
+
+'''File system utilities
+'''
+
+# Standard library imports.
 import sys
 import os
 import logging
@@ -5,7 +14,50 @@ import re
 from itertools import chain
 from subprocess import Popen
 
+__version__ = '0.01'
+
 def rsync_multiple(src, dst, opts, *paths, rsync_path='rsync'):
+    '''Runs *rsync* process multiple times
+
+    Parameters
+    ----------
+
+    src: str
+        Source filepath
+    dst: str
+        Destination filepath
+    opts: sequence
+        Extra options to *rsync* process
+    *paths: finite iterable of finite iterables of str
+        Inner iterables of strings have the following structure:
+
+        - The first path is the path to sync, and is relative to ``src`` and
+          ``dst``.
+        - The rest of the paths, if any, are paths to be excluded from the
+          *rsync* invocation. They are relative to the first path of the inner
+          iterable
+
+        If any path is a directory it must end with character ``/``.
+
+        The length of this argument is the number of times the *rsync* process
+        will be executed.
+    rsync_path: str
+        *Optional*, path to *rsync* executable
+
+    Returns
+    -------
+    reports: tuple of tuples of length 2
+        Inner tuples have the following structure:
+
+        1. Tuple of strings with the command line of the *rsync* invocation
+        2. ``int``, return code of the *rsync* invocation
+
+    Notes
+    -----
+
+    See `this technical note
+    <http://pedroivanlopez.com/rsync/#selective-mirror-with-excluded-directories>`
+    '''
     report = []
     for ipaths in paths:
         cmd = [rsync_path, '--relative']
@@ -23,7 +75,7 @@ def rsync_multiple(src, dst, opts, *paths, rsync_path='rsync'):
             proc.wait()
             if proc.returncode:
                 logging.error(
-                        'rsync proccess `{0}` returned code {1}'.format(
+                        'rsync process `{0}` returned code {1}'.format(
                             ' '.join(cmd), proc.returncode))
             report.append((tuple(cmd), proc.returncode))
 
