@@ -1,11 +1,13 @@
 import sys
 import os
+import logging
 from random import SystemRandom
 from string import ascii_letters, digits
 from os.path import abspath, dirname, basename, splitext
 from inspect import getfile
 
 ALPHA_NUMERIC_STR = ascii_letters + digits
+LOG_MSG_FMT_DEFAULT = '[{0}]: %(message)s'
 
 sys_random = SystemRandom()
 
@@ -24,3 +26,9 @@ def getdir(obj):
 
 def get_script_name():
     return splitext(basename(sys.argv[0]))[0]
+
+def logging_config(prgname=None, msgfmt=LOG_MSG_FMT_DEFAULT,
+        level=logging.INFO):
+    '''Most basic logging configuration with default values'''
+    prgname = get_script_name() if not prgname else prgname
+    logging.basicConfig(format=msgfmt.format(prgname), level=level)

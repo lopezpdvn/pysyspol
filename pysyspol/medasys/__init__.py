@@ -1,3 +1,4 @@
+import sys
 import json
 import logging
 from os import access, R_OK, walk
@@ -12,6 +13,9 @@ def get_core_resources(core_resources_fp):
 
 def logging_config(prgname=None, msgfmt='[{0}]: %(message)s',
         level=logging.INFO):
+    '''Deprecated'''
+    print('Function `pysyspol.medasys.logging_config` is deprecated',
+            file=sys.stderr)
     prgname = get_script_name() if not prgname else prgname
     logging.basicConfig(format=msgfmt.format(prgname), level=level)
 
