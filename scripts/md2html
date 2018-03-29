@@ -1,0 +1,45 @@
+#!/usr/bin/env python3
+# coding=utf-8
+
+'''md2html'''
+
+# Standard library imports.
+import sys
+import atexit
+import gc
+from subprocess import Popen, PIPE
+
+# Related third party imports.
+# import third_party_mod
+
+# GLOBAL CONSTANT names.  *if main* section at bottom sets global names too.
+MARKDOWN_EXE = 'markdown'
+HTML_CHARSET = 'utf-8'
+HTML_HEAD = '''<head>
+  <meta charset="{}">
+</head>'''.format(HTML_CHARSET)
+
+def on_exit():
+    '''Actions to do on exit.'''
+    # Invoke the garbage collector.
+    gc.collect()
+
+def main():
+    '''Main program function.'''
+
+    print('<!DOCTYPE html>\n<html>')
+    print(HTML_HEAD)
+    print('<body>')
+    input_fp = sys.argv[1]
+
+    cmd = (MARKDOWN_EXE, input_fp)
+    with Popen(cmd, stdout=PIPE, stderr=PIPE, universal_newlines=True) as proc:
+        print(proc.stdout.read())
+
+    print('</body>\n</html>', end='')
+
+if __name__ == "__main__":
+    atexit.register(on_exit)
+    main()
+
+# vim: ft=python
