@@ -18,7 +18,7 @@ FROM Tags t
     ON i.album = a.id
   INNER JOIN AlbumRoots ar
     ON ar.id = a.albumRoot
-WHERE LOWER(t.Name) IN (?)\
+WHERE LOWER(t.Name) IN ({})\
 '''
 
 EXCLUDE_DIGIKAM_TAGS = set(('_Digikam_Internal_Tags_',))
@@ -31,9 +31,9 @@ def get_tags(dbfp, exclude=EXCLUDE_DIGIKAM_TAGS):
         - exclude)
     return tags
 
-def get_tagged_img_paths(dbfp, tag):
-    query = SQL_SEARCH_TAGGED
-    args = (tag,)
+def get_tagged_img_paths(dbfp, tags):
+    query = SQL_SEARCH_TAGGED.format(','.join('?'*len(tags)))
+    args = tags
     conn = sqlite3.connect(dbfp)
     c = conn.cursor()
     return list( chain.from_iterable( c.execute(query, args) ) )
