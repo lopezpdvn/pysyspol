@@ -1,5 +1,6 @@
 import sqlite3
 from itertools import chain
+from os.path import join, dirname
 
 SQL_SELECT_TAGS = "SELECT Name FROM Tags WHERE pid != 1"
 
@@ -36,4 +37,6 @@ def get_tagged_img_paths(dbfp, tags):
     args = tags
     conn = sqlite3.connect(dbfp)
     c = conn.cursor()
-    return list( chain.from_iterable( c.execute(query, args) ) )
+    dbfp_dirname = dirname(dbfp)
+    for relpath in chain.from_iterable(c.execute(query, args)):
+        yield join(dbfp_dirname, relpath)
