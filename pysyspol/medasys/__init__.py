@@ -68,3 +68,35 @@ def get_all_resources(resources_fp, approot_fp):
             continue
         for f in files:
             yield join(relpath, f).replace(resources_fp, '').strip(sep)
+
+def get_matched_resource(resource_path, core_resources, resources_path):
+    matches = []
+    resource_path = resource_path.lower()
+
+    i = 0
+    for resource in core_resources:
+        for path in resource['path']:
+            if resource_path in path.lower():
+                matches.append((i, resource))
+        i += 1
+
+    if len(matches) > 1:
+        raise ValueError(
+                'len(matches) > 1, can only edit one resource at a time')
+
+    if len(matches) == 1:
+        return matches[0]
+
+    matches = []
+    for relpath, dirs, files in walk(resources_path):
+        if matches:
+            break
+        for fname in files:
+            if resource_path in fname.lower():
+                matches.append((-1, join(relpath, fname)))
+                break
+
+    if not matches:
+        raise ValueError('No matched core resource')
+
+    return matches[0]
