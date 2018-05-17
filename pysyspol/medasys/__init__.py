@@ -1,7 +1,7 @@
 import sys
 import json
 import logging
-from os import access, R_OK, walk
+from os import access, R_OK, walk, remove
 from os.path import join, sep
 from itertools import chain
 
@@ -100,3 +100,21 @@ def get_matched_resource(resource_path, core_resources, resources_path):
         raise ValueError('No matched core resource')
 
     return matches[0]
+
+def update_resource_tags(tagging_resource_path, core_resources_path,
+        core_resources, resources_path):
+    with open(tagging_resource_path) as tagging_resource_f:
+        tagging_resource = json.load(tagging_resource_f)
+
+    tagging_resource['tags'] = sorted(set(
+        tag for selected, tag in tagging_resource['tags'] if selected))
+    i = get_matched_resource(tagging_resource['path'][0], core_resources,
+            resources_path)[0]
+    core_resources[i] = tagging_resource
+
+    with open(core_resources_path, 'w') as f:
+        json.dump(core_resources, f, indent=2, sort_keys=True)
+
+    logging.info('Printed `{}`'.format(core_resources_path))
+    remove(tagging_resource_path)
+    logging.info('Removed `{}`'.format(tagging_resource_path))
