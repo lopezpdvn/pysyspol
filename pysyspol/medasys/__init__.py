@@ -7,6 +7,9 @@ from itertools import chain
 
 from pysyspol.util import get_script_name
 
+MODE_UPDATE = 'update'
+MODE_RETRIEVE = 'retrieve'
+
 def get_core_resources(core_resources_fp):
     with open(core_resources_fp) as coref:
         return json.load(coref)
@@ -118,3 +121,12 @@ def update_resource_tags(tagging_resource_path, core_resources_path,
     logging.info('Printed `{}`'.format(core_resources_path))
     remove(tagging_resource_path)
     logging.info('Removed `{}`'.format(tagging_resource_path))
+
+
+def get_mode(tagging_resource_path):
+    try:
+        with open(tagging_resource_path) as tagging_resource_f:
+            json.load(tagging_resource_f)
+        return MODE_UPDATE
+    except FileNotFoundError:
+        return MODE_RETRIEVE
