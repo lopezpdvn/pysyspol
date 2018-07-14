@@ -1,11 +1,14 @@
 import sys
+import os
 import json
 import logging
+import datetime as dt
 from os import access, R_OK, walk, remove
 from os.path import join, sep
 from itertools import chain
 
 from pysyspol.util import get_script_name
+import timeman
 
 MODE_UPDATE = 'update'
 MODE_RETRIEVE = 'retrieve'
@@ -130,3 +133,22 @@ def get_mode(tagging_resource_path):
         return MODE_UPDATE
     except FileNotFoundError:
         return MODE_RETRIEVE
+
+
+def add_core_resource(new_resource_fp, core_resources, resources_path,
+        core_resources_path, core_resource_schema_path,
+        datetime_fmt=timeman.DEFAULT_DATETIME_FMT):
+
+    with open(core_resource_schema_path) as core_schema_f:
+        new_core_res = json.load(core_schema_f)
+
+    relative_new_resource_fp = os.path.relpath(new_resource_fp, resources_path)
+    new_core_res['path'].append(relative_new_resource_fp)
+    new_core_res['datetime'] = dt.datetime.today().strftime(datetime_fmt)
+
+    core_resources.append(new_core_res)
+    with open(core_resources_path, 'w') as f:
+        json.dump(core_resources, f, indent=2, sort_keys=True)
+
+    msg = 'Added core resource with path `{}` to database. Run again to edit tags'
+    logging.info(msg.format(relative_new_resource_fp))
