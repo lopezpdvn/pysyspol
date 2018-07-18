@@ -6,6 +6,7 @@
 # Standard library imports.
 from __future__ import division
 from pprint import pprint
+from argparse import ArgumentParser
 import sys
 import os
 import atexit
@@ -29,14 +30,14 @@ def on_exit():
     # Invoke the garbage collector.
     gc.collect()
 
-def main():
+def main(username):
     '''Main program function.'''
 
     branches_dict = json.loads(sys.stdin.read())
     branches = [branch['path']
             for root_branch in branches_dict['value']
             for branch in traverse_branch_tree(root_branch, [])
-            if branch['owner']['uniqueName'] == r'DOMAIN\username']
+            if branch['owner']['uniqueName'] == username]
     json.dump(branches, sys.stdout)
 
 def traverse_branch_tree(root_branch, stack):
@@ -53,9 +54,14 @@ if __name__ == "__main__":
     # Program name from file name.
     PN = os.path.splitext(sys.argv[0])[0]
 
+
+    parser = ArgumentParser()
+    parser.add_argument('-u', '--username', required=True)
+    args = parser.parse_args()
+
     # Log file.
     LOGF = ''.join([PN, '_log', '.txt'])
 
     atexit.register(on_exit)
 
-    main()
+    main(args.username)
