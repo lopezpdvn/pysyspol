@@ -6,6 +6,7 @@
 # Standard library imports.
 from __future__ import division
 from pprint import pprint
+from argparse import ArgumentParser
 import sys
 import os
 import atexit
@@ -24,14 +25,19 @@ import gc
 
 def on_exit():
     '''Actions to do on exit.'''
-    print('on_exit', LOGF)
+    #print('on_exit', LOGF)
 
     # Invoke the garbage collector.
     gc.collect()
 
 def main():
-    '''Main program function.'''
-    pass
+    parser = ArgumentParser()
+    parser.add_argument('filename_src', nargs='*',
+            help='''Regular file or directory''')
+    args = parser.parse_args()
+
+    for fname in args.filename_src:
+        fname_dirname, fname_basename = os.path.split(fname)
 
 if __name__ == "__main__":
     # Program name from file name.
