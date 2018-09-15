@@ -1,0 +1,45 @@
+#!/usr/bin/env python
+# coding=utf-8
+
+'''randomize-basename'''
+
+# Standard library imports.
+from __future__ import division
+from pprint import pprint
+import sys
+import os
+import atexit
+import gc
+
+# Related third party imports.
+# import third_party_mod
+
+# Local application/library specific imports.
+# import app_specific_mod
+
+# Relevant ``__all__`` specification here.
+# __all__ = ...
+
+# GLOBAL CONSTANT names.  *if main* section at bottom sets global names too.
+
+def on_exit():
+    '''Actions to do on exit.'''
+    print('on_exit', LOGF)
+
+    # Invoke the garbage collector.
+    gc.collect()
+
+def main():
+    '''Main program function.'''
+    pass
+
+if __name__ == "__main__":
+    # Program name from file name.
+    PN = os.path.splitext(sys.argv[0])[0]
+
+    # Log file.
+    LOGF = ''.join([PN, '_log', '.txt'])
+
+    atexit.register(on_exit)
+
+    main()
