@@ -1,4 +1,4 @@
-#!/usr/bin/env python
+#!/usr/bin/env python3
 # coding=utf-8
 
 '''randomize-basename'''
@@ -11,9 +11,10 @@ import sys
 import os
 import atexit
 import gc
+import shutil
 
 # Related third party imports.
-# import third_party_mod
+from pysyspol.util import random_alphanumeric_str
 
 # Local application/library specific imports.
 # import app_specific_mod
@@ -30,6 +31,20 @@ def on_exit():
     # Invoke the garbage collector.
     gc.collect()
 
+def randomize_basename(fname, ntries=16, basename_len=40, verbose=False):
+    _ntries = ntries
+    dirname, basename_src = os.path.split(fname)
+    fname_dst = fname
+
+    while fname_dst == fname and _ntries > 0:
+        basename_dst = random_alphanumeric_str(basename_len)
+        fname_dst = os.path.join(dirname, basename_dst)
+        _ntries -= 1
+
+    shutil.move(fname, fname_dst)
+    if verbose:
+        print('`{}` -> `{}`'.format(fname, fname_dst), file=sys.stdout)
+
 def main():
     parser = ArgumentParser()
     parser.add_argument('filename_src', nargs='*',
@@ -37,7 +52,7 @@ def main():
     args = parser.parse_args()
 
     for fname in args.filename_src:
-        fname_dirname, fname_basename = os.path.split(fname)
+        randomize_basename(fname, verbose=True)
 
 if __name__ == "__main__":
     # Program name from file name.
