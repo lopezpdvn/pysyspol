@@ -32,18 +32,21 @@ def on_exit():
     gc.collect()
 
 def randomize_basename(fname, ntries=16, basename_len=40, verbose=False):
-    _ntries = ntries
+    assert ntries > 0
+    assert basename_len > 0
+
+    itry = ntries
     dirname, basename_src = os.path.split(fname)
     fname_dst = fname
 
-    while os.path.exists(fname_dst) and _ntries > 0:
+    while os.path.exists(fname_dst):
+        if itry <= 0:
+            msg = "Failed {} times to find an available basename".format(ntries)
+            raise OSError(msg)
+
         basename_dst = random_alphanumeric_str(basename_len)
         fname_dst = os.path.join(dirname, basename_dst)
-        _ntries -= 1
-
-    if not _ntries:
-        msg = "Failed {} times to find an available basename".format(ntries)
-        raise OSError(msg)
+        itry -= 1
 
     shutil.move(fname, fname_dst)
     if verbose:
