@@ -50,7 +50,7 @@ def randomize_basename(fname, ntries=16, basename_len=40, verbose=False):
 
     shutil.move(fname, fname_dst)
     if verbose:
-        print('`{}` -> `{}`'.format(fname, fname_dst), file=sys.stdout)
+        print('`{}` -> `{}`'.format(fname, fname_dst), file=sys.stderr)
 
 def main():
     parser = ArgumentParser()
