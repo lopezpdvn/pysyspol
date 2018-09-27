@@ -31,7 +31,8 @@ def on_exit():
     # Invoke the garbage collector.
     gc.collect()
 
-def randomize_basename(fname, ntries=16, basename_len=40, verbose=False):
+def randomize_basename(fname, ntries=16, basename_len=40, verbosity=0,
+        fverbose=sys.stderr):
     assert ntries > 0
     assert basename_len > 0
 
@@ -49,8 +50,8 @@ def randomize_basename(fname, ntries=16, basename_len=40, verbose=False):
         itry -= 1
 
     shutil.move(fname, fname_dst)
-    if verbose:
-        print('`{}` -> `{}`'.format(fname, fname_dst), file=sys.stderr)
+    if verbosity:
+        print('`{}` -> `{}`'.format(fname, fname_dst), file=fverbose)
 
 def main():
     parser = ArgumentParser()
@@ -59,7 +60,7 @@ def main():
     args = parser.parse_args()
 
     for fname in args.filename_src:
-        randomize_basename(fname, verbose=True)
+        randomize_basename(fname, verbosity=1)
 
 if __name__ == "__main__":
     # Program name from file name.
