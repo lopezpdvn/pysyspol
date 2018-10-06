@@ -11,8 +11,11 @@ import sys
 import os
 import logging
 import re
+import shutil
 from itertools import chain
 from subprocess import Popen
+
+from pysyspol.util import random_alphanumeric_str
 
 __version__ = '0.01'
 
@@ -102,3 +105,32 @@ def is_filesystem_mounted(*, reobj=None, device='', mountdir=''):
             reobj = re.compile(r'.*{}.*{}.*'.format(device, mountdir))
     with open('/proc/mounts') as mounts:
         return any(reobj.match(mount.strip()) for mount in mounts)
+
+def randomize_basename(fname, ntries=16, basename_len=40, verbosity=0,
+        fverbose=sys.stderr, preserve_ext=True):
+    assert ntries > 0
+    assert basename_len > 0
+
+    itry = ntries
+    dirname, basename_src = os.path.split(fname)
+    fname_dst = fname
+
+    while os.path.exists(fname_dst):
+        if itry <= 0:
+            msg = "Failed {} times to find an available basename".format(ntries)
+            raise OSError(msg)
+
+        basename_dst_woext = random_alphanumeric_str(basename_len)
+        if preserve_ext:
+            basename_src_woext, basename_src_ext = os.path.splitext(
+                                                                   basename_src)
+            basename_dst = basename_dst_woext + basename_src_ext
+        else:
+            basename_dst = basename_dst_woext
+
+        fname_dst = os.path.join(dirname, basename_dst)
+        itry -= 1
+
+    shutil.move(fname, fname_dst)
+    if verbosity:
+        print('`{}` -> `{}`'.format(fname, fname_dst), file=fverbose)
