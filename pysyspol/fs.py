@@ -134,3 +134,5 @@ def randomize_basename(fname, ntries=16, basename_len=40, verbosity=0,
     shutil.move(fname, fname_dst)
     if verbosity:
         print('`{}` -> `{}`'.format(fname, fname_dst), file=fverbose)
+
+    return fname_dst
