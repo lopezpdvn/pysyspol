@@ -107,7 +107,7 @@ def is_filesystem_mounted(*, reobj=None, device='', mountdir=''):
         return any(reobj.match(mount.strip()) for mount in mounts)
 
 def randomize_basename(fname, ntries=16, basename_len=40, verbosity=0,
-        fverbose=sys.stderr, preserve_ext=True):
+        fverbose=sys.stderr, preserve_ext=True, dryrun=False):
     assert ntries > 0
     assert basename_len > 0
 
@@ -131,7 +131,9 @@ def randomize_basename(fname, ntries=16, basename_len=40, verbosity=0,
         fname_dst = os.path.join(dirname, basename_dst)
         itry -= 1
 
-    shutil.move(fname, fname_dst)
+    if not dryrun:
+        shutil.move(fname, fname_dst)
+
     if verbosity:
         print('`{}` -> `{}`'.format(fname, fname_dst), file=fverbose)
 
