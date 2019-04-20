@@ -2,6 +2,7 @@ import sys
 import os
 import json
 import logging
+import re
 import datetime as dt
 from os import access, R_OK, walk, remove
 from os.path import join, sep
@@ -152,3 +153,22 @@ def add_core_resource(new_resource_fp, core_resources, resources_path,
 
     msg = 'Added core resource with path `{}` to database. Run again to edit tags'
     logging.info(msg.format(relative_new_resource_fp))
+
+
+def list_grepped_resources(resources, patterns):
+    for resource in get_grepped_resources(resources, patterns):
+        for path in resource['path']:
+            print(path)
+
+def get_grepped_resources(resources, patterns):
+    pattern = r'.*{}.*'.format(patterns[0])
+    print(pattern)
+    reobj = re.compile(pattern)
+    for resource in resources:
+        for path in resource['path']:
+            with open(path) as f:
+                print(path)
+                if not reobj.match(f.read()):
+                    continue
+                yield resource
+                break
