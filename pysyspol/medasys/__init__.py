@@ -161,7 +161,7 @@ def list_grepped_resources(resources, patterns):
             print(path)
 
 def get_grepped_resources(resources, patterns,
-        grep_cmd=('grep', '-i', '-q', '-e')):
+        grep_cmd=('grep', '-i', '-q', '-E')):
     pattern = patterns[0]
     for resource in resources:
         for path in resource['path']:
