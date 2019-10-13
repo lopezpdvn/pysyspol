@@ -7,6 +7,7 @@ import datetime as dt
 from os import access, R_OK, walk, remove
 from os.path import join, sep
 from itertools import chain
+from subprocess import Popen
 
 from pysyspol.util import get_script_name
 import timeman
@@ -160,6 +161,7 @@ def list_grepped_resources(resources, patterns):
         for path in resource['path']:
             print(path)
 
+<<<<<<< HEAD
 def get_grepped_resources(resources, patterns):
     pattern = r'.*{}.*'.format(patterns[0])
     print(pattern)
@@ -169,6 +171,17 @@ def get_grepped_resources(resources, patterns):
             with open(path) as f:
                 print(path)
                 if not reobj.match(f.read()):
+=======
+def get_grepped_resources(resources, patterns,
+        grep_cmd=('grep', '-i', '-q', '-E')):
+    pattern = patterns[0]
+    for resource in resources:
+        for path in resource['path']:
+            cmd = (*grep_cmd, pattern, path)
+            with Popen(cmd) as proc:
+                proc.wait()
+                if proc.returncode:
+>>>>>>> dev
                     continue
                 yield resource
                 break
