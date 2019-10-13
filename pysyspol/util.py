@@ -2,11 +2,11 @@ import sys
 import os
 import logging
 from random import SystemRandom
-from string import ascii_letters, digits
+from string import ascii_lowercase, digits
 from os.path import abspath, dirname, basename, splitext
 from inspect import getfile
 
-ALPHA_NUMERIC_STR = ascii_letters + digits
+ALPHA_NUMERIC_STR = ascii_lowercase + digits
 LOG_MSG_FMT_DEFAULT = '[{0}]: %(message)s'
 
 sys_random = SystemRandom()
