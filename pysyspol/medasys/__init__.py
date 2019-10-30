@@ -161,17 +161,6 @@ def list_grepped_resources(resources, patterns):
         for path in resource['path']:
             print(path)
 
-<<<<<<< HEAD
-def get_grepped_resources(resources, patterns):
-    pattern = r'.*{}.*'.format(patterns[0])
-    print(pattern)
-    reobj = re.compile(pattern)
-    for resource in resources:
-        for path in resource['path']:
-            with open(path) as f:
-                print(path)
-                if not reobj.match(f.read()):
-=======
 def get_grepped_resources(resources, patterns,
         grep_cmd=('grep', '-i', '-q', '-E')):
     pattern = patterns[0]
@@ -181,7 +170,6 @@ def get_grepped_resources(resources, patterns,
             with Popen(cmd) as proc:
                 proc.wait()
                 if proc.returncode:
->>>>>>> dev
                     continue
                 yield resource
                 break
